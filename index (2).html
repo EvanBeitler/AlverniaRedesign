@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Find your major | Alvernia undergraduate prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2F5F3;--ink:#13231E;--mute:#44564F;--card:#fff;--line:#BFCDC6;--acc:#1D6A50;--on:#fff;--hi:#E0A100;
+ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1A16;--ink:#E8F0EC;--mute:#A4B8AF;--card:#16251F;--line:#2F443B;--acc:#6CCBA3;--on:#0F1A16;--hi:#F2B632;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1A16;--ink:#E8F0EC;--mute:#A4B8AF;--card:#16251F;--line:#2F443B;--acc:#6CCBA3;--on:#0F1A16;--hi:#F2B632;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.5 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:60rem;margin:0 auto;padding:1.25rem 1rem 3rem}
+.note{font-size:.875rem;color:var(--mute);margin:0 0 1.5rem}
+.note a{color:inherit}
+h1{font-size:clamp(1.9rem,6vw,3.2rem);line-height:1.05;letter-spacing:-.02em;font-weight:700;margin:0 0 .5rem;max-width:18ch}
+.lede{margin:0 0 1.25rem;color:var(--mute);max-width:48ch}
+label.q{display:block;font-weight:600;margin-bottom:.35rem}
+input[type=search]{width:100%;font:inherit;font-size:1.15rem;padding:.8rem 1rem;border:2px solid var(--ink);border-radius:.5rem;background:var(--card);color:var(--ink)}
+.hint{font-size:.875rem;color:var(--mute);margin:.35rem 0 1.25rem}
+fieldset{border:0;margin:0 0 1rem;padding:0}
+legend{font-weight:600;padding:0;margin-bottom:.4rem}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.chip{font:inherit;font-size:.95rem;min-height:2.75rem;padding:.4rem .9rem;border:1.5px solid var(--line);border-radius:2rem;background:var(--card);color:var(--ink);cursor:pointer}
+.chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--on);font-weight:600}
+.chip[aria-pressed=true]::before{content:"\2713\00a0"}
+:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:1rem;border-top:2px solid var(--ink);padding-top:.75rem;margin-top:1.5rem}
+#count{font-weight:600;margin:0}
+#reset{font:inherit;background:none;border:0;color:var(--ink);text-decoration:underline;min-height:2.75rem;padding:0 .25rem;cursor:pointer}
+ul.list{list-style:none;margin:1rem 0 0;padding:0;display:grid;gap:.75rem;grid-template-columns:repeat(auto-fill,minmax(15.5rem,1fr))}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:.5rem;padding:.9rem 1rem;height:100%}
+.card h2{font-size:1.05rem;line-height:1.25;margin:0 0 .5rem;font-weight:600}
+.card a{color:var(--ink);text-underline-offset:.2em}
+.card a:hover{color:var(--acc)}
+.meta{margin:0;font-size:.875rem;color:var(--mute)}
+.tag{display:inline-block;margin-top:.5rem;font-size:.85rem;font-weight:600;padding:.1rem .5rem;border:1.5px solid var(--acc);border-radius:.25rem}
+.tag.a,.tag.o{background:var(--acc);color:var(--on)}
+#empty{margin-top:1rem;padding:1rem;border:2px dashed var(--ink);border-radius:.5rem}
+#empty h2{margin:0 0 .5rem;font-size:1.2rem}
+#empty ul{padding-left:1.1rem;margin:.5rem 0 0}
+#empty li{margin:.4rem 0}
+#empty a,#empty button{color:var(--ink)}
+#empty button{font:inherit;background:none;border:0;padding:0;text-decoration:underline;cursor:pointer;min-height:2.75rem}
+[hidden]{display:none!important}
+@media (max-width:30rem){.bar{flex-direction:column;align-items:flex-start;gap:0}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<p class="note">Student prototype for an AI class, not an official Alvernia page. Program names and links come from the <a href="https://www.alvernia.edu/undergraduate">official undergraduate programs page</a>; grouping and search words were added for this redesign.</p>
+<main>
+<h1>Find a major that fits what you want to do</h1>
+<p class="lede">Search by a subject, a job, or a skill. Narrow the list with the filters below.</p>
+
+<label class="q" for="q">Search programs</label>
+<input id="q" type="search" autocomplete="off" placeholder="Try coding, sports, nursing, film…" aria-describedby="hint">
+<p class="hint" id="hint">Press Esc to clear the search.</p>
+
+<fieldset><legend>Area of study</legend><div class="chips" id="areas"></div></fieldset>
+<fieldset><legend>Type of program</legend><div class="chips" id="types"></div></fieldset>
+
+<div class="bar"><p id="count" role="status" aria-live="polite"></p><button id="reset" type="button">Clear search and filters</button></div>
+<ul class="list" id="list"></ul>
+<div id="empty" hidden tabindex="-1"></div>
+</main>
+</div>
+<script>
+(function(){
+var B="https://www.alvernia.edu/academics/";
+var AREAS={B:"Business & finance",H:"Health & science",T:"Technology & data",E:"Engineering",P:"People & society",C:"Communication, arts & humanities",X:"Not sure yet"};
+var TYPES={s:"Four-year major",a:"Accelerated to a graduate degree",o:"Online completion"};
+var RAW=[
+"Accounting|undergraduate-major/accounting|B|s|cpa numbers tax audit",
+"Addictions and Mental Health Treatment|undergraduate-major/addictions-and-mental-health-treatment|P|s|counseling recovery therapy helping",
+"Addictions and Mental Health Treatment, MA in Clinical Counseling Bridge (3+3)|undergraduate-major/addictions-and-mental-health-treatment-macc-bridge-program|P|a|counselor therapist master's",
+"Artificial Intelligence (Computer Science)|undergraduate-major/computer-science|T|s|coding programming software machine learning ai",
+"Biochemistry|UG/biochemistry|H|s|chemistry lab research",
+"Biochemistry, Doctorate of Physical Therapy (3+3)|undergraduate-major/doctorate-physical-therapy-biochemistry-track|H|a|dpt physical therapist",
+"Biology|undergraduate-major/biology|H|s|life science lab pre-med",
+"Biology, Doctorate of Physical Therapy (3+3)|undergraduate-major/doctorate-physical-therapy-biology-track|H|a|dpt physical therapist",
+"Biology, Master of Medical Science in Physician Associate Studies (3+2)|undergraduate-major/physician-associate-program-bio-pa-32-accelerated-track|H|a|pa physician assistant medicine",
+"Biology, Medical Laboratory Science|undergraduate-major/biology-medical-laboratory-science|H|s|lab clinical testing",
+"Biomedical Engineering|undergraduate-major/bachelor-science-biomedical-engineering|E|s|medical devices design",
+"Business Administration and Management|undergraduate-major/management|B|s|leadership manager",
+"Business Analytics|undergraduate-major/business-analytics-bs|T|s|data analysis business",
+"Chemistry|UG/chemistry|H|s|lab research",
+"Civil Engineering|undergraduate-major/bachelor-science-civil-engineering|E|s|bridges buildings construction roads",
+"Communication|undergraduate-major/communication-and-digital-media|C|s|film journalism public relations advertising media design sports media",
+"Criminal Justice|undergraduate-major/criminal-justice-administration|P|s|police law courts",
+"Cybersecurity|undergraduate-major/cybersecurity-bs|T|s|hacking security networks computers",
+"Data Science|undergraduate-major/data-science-bs|T|s|statistics analytics coding",
+"Digital Humanities|undergraduate-major/bachelor-arts-digital-humanities|C|s|technology culture history writing",
+"Digital Media Marketing|undergraduate-major/digital-media-marketing|B|s|social media advertising online",
+"Early Childhood Education (PK-4)|undergraduate-major/early-childhood-education-ba-grades-pk-4-certification|P|s|teacher teaching children school",
+"Early Childhood Education (PK-4) and Special Education Certification (PK-12)|ug/childhood-education-special-ed|P|s|teacher teaching special education school",
+"Electrical Engineering|UG/electrical-engineering|E|s|circuits power electronics",
+"Environmental Science|undergraduate-major/environmental-science|H|s|sustainability ecology climate",
+"Exercise Science|undergraduate-major/bachelor-science-exercise-science|H|s|fitness sports training",
+"Exploratory Program|undergraduate-major/exploratory-program|X|s|undecided undeclared unsure",
+"Finance|undergraduate-major/finance|B|s|money investing banking",
+"Forensic Science|undergraduate-major/forensic-science|H|s|crime lab investigation",
+"General Science|UG/general-science|H|s|biology chemistry physics",
+"Health Science, Master of Science in Athletic Training (5-year)|undergraduate-major/athletic-training-msat|H|a|athletic trainer sports",
+"Health Science, Master of Science in Occupational Therapy (5-year)|UG/BSHCS-MSOT|H|a|occupational therapist",
+"Healthcare Administration|undergraduate-major/healthcare-administration|B|s|hospital management",
+"Healthcare Science|undergraduate-major/healthcare-science|H|s|clinical",
+"Healthcare Science, Doctorate of Physical Therapy (3+3)|undergraduate-major/doctorate-physical-therapy-healthcare-science-track|H|a|dpt physical therapist",
+"History|undergraduate-major/history|C|s|past research writing",
+"Human Problems and Sustainable Solutions|undergraduate-major/human-problems-and-sustainable-solutions-ba|P|s|social issues community change",
+"Industrial Engineering Technology & Management|undergraduate-major/bachelor-science-industrial-engineering-technology-management|E|s|manufacturing operations supply chain",
+"Literature|undergraduate-major/literature|C|s|english reading writing",
+"Marketing|undergraduate-major/marketing|B|s|brands advertising sales",
+"Mathematics|undergraduate-major/mathematics|T|s|math statistics",
+"Mechanical Engineering|UG/mechanical-engineering|E|s|machines design robotics",
+"Nursing, BSN|undergraduate-major/nursing|H|s|nurse patients hospital",
+"Nursing RN to BSN Completion Program|online/rn-bsn-completion-program-online|H|o|nurse registered nurse online degree completion",
+"Philosophy|undergraduate-major/philosophy|C|s|ethics logic",
+"Political Science|undergraduate-major/political-science|P|s|government politics law policy",
+"Psychology|undergraduate-major/psychology|P|s|mental health behavior counseling",
+"Psychology, MA in Clinical Counseling Bridge (3+3)|UG/psych-macc|P|a|counselor therapist master's",
+"Social Influencing, Communication, and Creative Media|undergraduate-major/bachelor-arts-social-influencing-communication-and-creative-media|C|s|content creator influencer social media video",
+"Social Work|undergraduate-major/social-work|P|s|helping families community",
+"Sport Management|undergraduate-major/sport-management|B|s|sports business athletics",
+"Theatre|undergraduate-major/theatre|C|s|acting stage drama performing",
+"Theology|undergraduate-major/theology|C|s|religion faith ministry"
+];
+var DATA=RAW.map(function(l){var p=l.split("|");return{n:p[0],u:B+p[1],a:p[2],t:p[3],h:(p[0]+" "+p[4]+" "+AREAS[p[2]]+" "+TYPES[p[3]]).toLowerCase()};});
+var st={q:"",a:{},t:""};
+var $=function(id){return document.getElementById(id)};
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
+function chip(parent,label,pressed,fn){var b=document.createElement("button");b.type="button";b.className="chip";b.textContent=label;b.setAttribute("aria-pressed",pressed);b.onclick=function(){fn();render()};parent.appendChild(b);return b}
+function buildChips(){
+ var A=$("areas"),T=$("types");A.textContent="";T.textContent="";
+ Object.keys(AREAS).forEach(function(k){chip(A,AREAS[k],!!st.a[k],function(){if(st.a[k])delete st.a[k];else st.a[k]=1;buildChips()});});
+ chip(T,"Any",st.t==="",function(){st.t="";buildChips()});
+ Object.keys(TYPES).forEach(function(k){chip(T,TYPES[k],st.t===k,function(){st.t=st.t===k?"":k;buildChips()});});
+}
+function render(){
+ try{
+  var words=st.q.toLowerCase().split(/\s+/).filter(Boolean),areas=Object.keys(st.a);
+  var res=DATA.filter(function(d){
+   return words.every(function(w){return d.h.indexOf(w)>-1})&&(!areas.length||st.a[d.a])&&(!st.t||d.t===st.t);
+  });
+  $("list").innerHTML=res.map(function(d){
+   return '<li><div class="card"><h2><a href="'+esc(d.u)+'">'+esc(d.n)+'</a></h2><p class="meta">'+esc(AREAS[d.a])+'</p><span class="tag '+d.t+'">'+TYPES[d.t]+'</span></div></li>';
+  }).join("");
+  $("count").textContent=res.length+(res.length===1?" program":" programs")+" shown";
+  var e=$("empty");
+  if(!res.length){
+   e.hidden=false;
+   e.innerHTML='<h2></h2><p>Try a broader word such as \u201chealth\u201d or \u201cbusiness\u201d, or remove a filter.</p><ul><li><button type="button" id="clr">Clear search and filters</button></li><li><a href="'+B+'undergraduate-major/exploratory-program">Not sure yet? See the Exploratory Program</a></li><li><a href="https://admissions.alvernia.edu/register/alvernia-programs-info-request">Ask admissions about a program that is not listed</a></li></ul>';
+   e.querySelector("h2").textContent=st.q?"No programs match \u201c"+st.q+"\u201d with these filters":"No programs match these filters";
+   $("clr").onclick=reset;
+  }else e.hidden=true;
+ }catch(err){
+  $("list").innerHTML="";$("count").textContent="";
+  var f=$("empty");f.hidden=false;
+  f.innerHTML='<h2>The program list could not be shown</h2><p>Reload the page. If this keeps happening, use the <a href="https://www.alvernia.edu/undergraduate">official programs list</a>.</p>';
+ }
+}
+function reset(){st={q:"",a:{},t:""};$("q").value="";buildChips();render();$("q").focus()}
+$("q").addEventListener("input",function(){st.q=this.value;render()});
+$("q").addEventListener("keydown",function(ev){if(ev.key==="Escape"&&this.value){this.value="";st.q="";render()}});
+$("reset").onclick=reset;
+buildChips();render();
+})();
+</script>
+</body>
+</html>
